@@ -1,7 +1,9 @@
 import os
 import sys
 
+
 import pygame
+import random
 
 
 def load_image(name, colorkey=None):
@@ -19,7 +21,28 @@ class Board:
     def __init__(self, field_width, field_height):
         self.field_width = field_width
         self.field_height = field_height
-        self.board = [[0] * width for _ in range(field_height)]
+        self.board = [['0'] * self.field_width for _ in range(self.field_height)]
+
+        list_mines = []
+        if field_width == field_height == 8:
+            while len(list_mines) < 10:
+                current_mine_coord = (random.randint(0, field_width - 1),
+                                      random.randint(0, field_height - 1))
+                
+                if current_mine_coord not in list_mines:
+                    list_mines.append(current_mine_coord)
+        
+        elif field_width == field_height == 16:
+            while len(list_mines) < 40:
+                current_mine_coord = (random.randint(0, field_width - 1),
+                                      random.randint(0, field_height - 1))
+                
+                if current_mine_coord not in list_mines:
+                    list_mines.append(current_mine_coord)
+        
+        for i in list_mines:
+            self.board[i[0]][i[1]] = '*'
+
         # значения по умолчанию
         self.left = 10
         self.top = 10
@@ -63,7 +86,7 @@ if __name__ == '__main__':
 
     fps = 60
     clock = pygame.time.Clock()
-    board = Board(10, 7)
+    board = Board(8, 8)
     board.set_view(100, 50, 40)
 
     running = True
