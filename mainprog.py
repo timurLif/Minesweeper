@@ -55,11 +55,32 @@ class Board:
     
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        self.open_cell(cell)
+        self.open_cell(cell[0], cell[1])
 
-    def open_cell(self, cell_coords):
-        print(*self.board, sep='\n')
-        print(cell_coords)
+    def open_cell(self, x, y):
+        if self.board[y][x] == '-':
+            self.board[y][x] = '0'
+            
+            if x > 0:
+                if self.board[y][x-1] == '-':
+                    self.open_cell(x-1, y)
+                if y > 0 and self.board[y-1][x-1] == '-':
+                    self.open_cell(x-1, y-1)
+                if y < self.field_height - 1 and self.board[y+1][x-1] == '-':
+                    self.open_cell(x-1, y+1)
+                    
+            if x < self.field_width - 1:
+                if self.board[y][x+1] == '-':
+                    self.open_cell(x+1, y)
+                if y > 0 and self.board[y-1][x+1] == '-':
+                    self.open_cell(x+1, y-1)
+                if y < self.field_height - 1 and self.board[y+1][x+1] == '-':
+                    self.open_cell(x+1, y+1)
+                    
+            if y > 0 and self.board[y-1][x] == '-':
+                self.open_cell(x, y-1)
+            if y < self.field_height - 1 and self.board[y+1][x] == '-':
+                self.open_cell(x, y+1)
 
     # Вычисление координат клетки
     def get_cell(self, mouse_pos):
@@ -77,7 +98,7 @@ class Board:
                                                    y * self.cell_size + self.top,
                                                    self.cell_size, self.cell_size), 1)
                 
-                if self.board[y][x] == '-':
+                if self.board[y][x] == '0':
                     screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
                                                                    y * self.cell_size + self.top + 1,
                                                                    self.cell_size - 2, self.cell_size - 2))
@@ -92,7 +113,7 @@ if __name__ == '__main__':
 
     fps = 60
     clock = pygame.time.Clock()
-    board = Board(8, 8)
+    board = Board(16, 16)
     #board.set_view(100, 50, 40)
 
     running = True
