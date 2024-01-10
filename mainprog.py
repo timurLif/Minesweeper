@@ -21,7 +21,7 @@ class Board:
     def __init__(self, field_width, field_height):
         self.field_width = field_width
         self.field_height = field_height
-        self.board = [['0'] * self.field_width for _ in range(self.field_height)]
+        self.board = [['-'] * self.field_width for _ in range(self.field_height)]
 
         list_mines = []
         if field_width == field_height == 8:
@@ -31,6 +31,8 @@ class Board:
                 
                 if current_mine_coord not in list_mines:
                     list_mines.append(current_mine_coord)
+            
+            self.set_view(30, 30, 50)
         
         elif field_width == field_height == 16:
             while len(list_mines) < 40:
@@ -39,15 +41,12 @@ class Board:
                 
                 if current_mine_coord not in list_mines:
                     list_mines.append(current_mine_coord)
+
+            self.set_view(30, 30, 25)
         
         for i in list_mines:
             self.board[i[0]][i[1]] = '*'
 
-        # значения по умолчанию
-        self.left = 10
-        self.top = 10
-        self.cell_size = 30
-    
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -56,9 +55,10 @@ class Board:
     
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        self.on_click(cell)
+        self.open_cell(cell)
 
-    def on_click(self, cell_coords):
+    def open_cell(self, cell_coords):
+        print(*self.board, sep='\n')
         print(cell_coords)
 
     # Вычисление координат клетки
@@ -76,18 +76,24 @@ class Board:
                 pygame.draw.rect(screen, 'white', (x * self.cell_size + self.left,
                                                    y * self.cell_size + self.top,
                                                    self.cell_size, self.cell_size), 1)
+                
+                if self.board[y][x] == '-':
+                    screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                   y * self.cell_size + self.top + 1,
+                                                                   self.cell_size - 2, self.cell_size - 2))
+        
 
 
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Minesweeper')
-    size = width, height = 600, 500
+    size = width, height = 600, 470
     screen = pygame.display.set_mode(size)
 
     fps = 60
     clock = pygame.time.Clock()
     board = Board(8, 8)
-    board.set_view(100, 50, 40)
+    #board.set_view(100, 50, 40)
 
     running = True
     while running:
@@ -99,6 +105,9 @@ if __name__ == '__main__':
                 board.get_click(event.pos)
 
         screen.fill((0, 0, 0))
+        """font = pygame.font.Font(None, 50)
+        text = font.render("-", True, (100, 255, 100))
+        screen.blit(text, (10, 10))"""
         board.render(screen)
         pygame.display.flip()
         clock.tick(fps)
