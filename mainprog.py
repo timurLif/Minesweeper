@@ -48,12 +48,11 @@ class Board:
             self.board[i[0]][i[1]] = '*'
 
         self.creation_of_numbers()
-        print(*self.board, sep='\n')
     
     def creation_of_numbers(self):
         for y in range(self.field_height):
             for x in range(self.field_width):
-                if self.board[x][y] != '*':
+                if self.board[y][x] != '*':
                     count = 0
 
                     if x != 0 and self.board[y][x - 1] == '*':
@@ -74,7 +73,7 @@ class Board:
                         count += 1
 
                     if count != 0:
-                        self.board[x][y] = f'-{count}'
+                        self.board[y][x] = f'-{count}'
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -110,6 +109,8 @@ class Board:
                 self.open_cell(x, y - 1)
             if y < self.field_height - 1 and self.board[y + 1][x] == '-':
                 self.open_cell(x, y + 1)
+        
+        #elif self.board[]
 
     # Вычисление координат клетки
     def get_cell(self, mouse_pos):
@@ -133,7 +134,6 @@ class Board:
                                                                    self.cell_size - 2, self.cell_size - 2))
         
 
-
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Minesweeper')
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
     fps = 60
     clock = pygame.time.Clock()
-    board = Board(16, 16)
+    board = Board(8, 8)
     #board.set_view(100, 50, 40)
 
     running = True
