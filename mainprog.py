@@ -47,6 +47,35 @@ class Board:
         for i in list_mines:
             self.board[i[0]][i[1]] = '*'
 
+        self.creation_of_numbers()
+        print(*self.board, sep='\n')
+    
+    def creation_of_numbers(self):
+        for y in range(self.field_height):
+            for x in range(self.field_width):
+                if self.board[x][y] != '*':
+                    count = 0
+
+                    if x != 0 and self.board[y][x - 1] == '*':
+                        count += 1
+                    if x != self.field_width - 1 and self.board[y][x + 1] == '*':
+                        count += 1
+                    if y != 0 and self.board[y - 1][x] == '*':
+                        count += 1
+                    if y != self.field_height - 1 and self.board[y + 1][x] == '*':
+                        count += 1
+                    if x != 0 and y != self.field_height - 1 and self.board[y + 1][x - 1] == '*':
+                        count += 1
+                    if x != self.field_width - 1 and y != self.field_height - 1 and self.board[y + 1][x + 1] == '*':
+                        count += 1
+                    if x != 0 and y != 0 and self.board[y - 1][x - 1] == '*':
+                        count += 1
+                    if x != self.field_width - 1 and y != 0 and self.board[y - 1][x + 1] == '*':
+                        count += 1
+
+                    if count != 0:
+                        self.board[x][y] = f'-{count}'
+
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -62,25 +91,25 @@ class Board:
             self.board[y][x] = '0'
             
             if x > 0:
-                if self.board[y][x-1] == '-':
-                    self.open_cell(x-1, y)
-                if y > 0 and self.board[y-1][x-1] == '-':
-                    self.open_cell(x-1, y-1)
-                if y < self.field_height - 1 and self.board[y+1][x-1] == '-':
-                    self.open_cell(x-1, y+1)
+                if self.board[y][x - 1] == '-':
+                    self.open_cell(x - 1, y)
+                if y > 0 and self.board[y - 1][x - 1] == '-':
+                    self.open_cell(x - 1, y - 1)
+                if y < self.field_height - 1 and self.board[y + 1][x - 1] == '-':
+                    self.open_cell(x - 1, y + 1)
                     
             if x < self.field_width - 1:
-                if self.board[y][x+1] == '-':
-                    self.open_cell(x+1, y)
-                if y > 0 and self.board[y-1][x+1] == '-':
-                    self.open_cell(x+1, y-1)
-                if y < self.field_height - 1 and self.board[y+1][x+1] == '-':
-                    self.open_cell(x+1, y+1)
+                if self.board[y][x + 1] == '-':
+                    self.open_cell(x + 1, y)
+                if y > 0 and self.board[y - 1][x + 1] == '-':
+                    self.open_cell(x + 1, y - 1)
+                if y < self.field_height - 1 and self.board[y + 1][x + 1] == '-':
+                    self.open_cell(x + 1, y + 1)
                     
-            if y > 0 and self.board[y-1][x] == '-':
-                self.open_cell(x, y-1)
-            if y < self.field_height - 1 and self.board[y+1][x] == '-':
-                self.open_cell(x, y+1)
+            if y > 0 and self.board[y - 1][x] == '-':
+                self.open_cell(x, y - 1)
+            if y < self.field_height - 1 and self.board[y + 1][x] == '-':
+                self.open_cell(x, y + 1)
 
     # Вычисление координат клетки
     def get_cell(self, mouse_pos):
