@@ -83,34 +83,63 @@ class Board:
     
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        self.open_cell(cell[0], cell[1])
-
+        if cell != None:
+            self.open_cell(cell[0], cell[1])
+    
     def open_cell(self, x, y):
         if self.board[y][x] == '-':
             self.board[y][x] = '0'
-            
+
             if x > 0:
                 if self.board[y][x - 1] == '-':
                     self.open_cell(x - 1, y)
-                if y > 0 and self.board[y - 1][x - 1] == '-':
-                    self.open_cell(x - 1, y - 1)
-                if y < self.field_height - 1 and self.board[y + 1][x - 1] == '-':
-                    self.open_cell(x - 1, y + 1)
-                    
+                elif len(self.board[y][x - 1]) == 2:
+                    self.board[y][x - 1] = self.board[y][x - 1][1]
+            
             if x < self.field_width - 1:
                 if self.board[y][x + 1] == '-':
                     self.open_cell(x + 1, y)
-                if y > 0 and self.board[y - 1][x + 1] == '-':
+                elif len(self.board[y][x + 1]) == 2:
+                    self.board[y][x + 1] = self.board[y][x + 1][1]
+            
+            if y > 0:
+                if self.board[y - 1][x] == '-':
+                    self.open_cell(x, y - 1)
+                elif len(self.board[y - 1][x]) == 2:
+                    self.board[y - 1][x] = self.board[y - 1][x][1]
+            
+            if y < self.field_height - 1:
+                if self.board[y + 1][x] == '-':
+                    self.open_cell(x, y + 1)
+                elif len(self.board[y + 1][x]) == 2:
+                    self.board[y + 1][x] = self.board[y + 1][x][1]
+            
+            if x > 0 and y > 0:
+                if self.board[y - 1][x - 1] == '-':
+                    self.open_cell(x - 1, y - 1)
+                elif len(self.board[y - 1][x - 1]) == 2:
+                    self.board[y - 1][x - 1] = self.board[y - 1][x - 1][1]
+            
+            if x > 0 and y < self.field_height - 1:
+                if self.board[y + 1][x - 1] == '-':
+                    self.open_cell(x - 1, y + 1)
+                elif len(self.board[y + 1][x - 1]) == 2:
+                    self.board[y + 1][x - 1] = self.board[y + 1][x - 1][1]
+            
+            if x < self.field_width - 1 and y > 0:
+                if self.board[y - 1][x + 1] == '-':
                     self.open_cell(x + 1, y - 1)
-                if y < self.field_height - 1 and self.board[y + 1][x + 1] == '-':
+                elif len(self.board[y - 1][x + 1]) == 2:
+                    self.board[y - 1][x + 1] = self.board[y - 1][x + 1][1]
+            
+            if x < self.field_width - 1 and y < self.field_height - 1:
+                if self.board[y + 1][x + 1] == '-':
                     self.open_cell(x + 1, y + 1)
-                    
-            if y > 0 and self.board[y - 1][x] == '-':
-                self.open_cell(x, y - 1)
-            if y < self.field_height - 1 and self.board[y + 1][x] == '-':
-                self.open_cell(x, y + 1)
+                elif len(self.board[y + 1][x + 1]) == 2:
+                    self.board[y + 1][x + 1] = self.board[y + 1][x + 1][1]
         
-        #elif self.board[]
+        elif len(self.board[y][x]) == 2:
+            self.board[y][x] = self.board[y][x][1]
 
     # Вычисление координат клетки
     def get_cell(self, mouse_pos):
@@ -118,7 +147,7 @@ class Board:
         cell_y = (mouse_pos[1] - self.top) // self.cell_size
         if 0 <= cell_x <= self.field_width - 1 and 0 <= cell_y <= self.field_height - 1:
             return (cell_x, cell_y)
-
+        
         return None
     
     def render(self, screen):
@@ -132,6 +161,15 @@ class Board:
                     screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
                                                                    y * self.cell_size + self.top + 1,
                                                                    self.cell_size - 2, self.cell_size - 2))
+                
+                elif len(self.board[y][x]) == 1 and self.board[y][x].isdigit():
+                    screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                   y * self.cell_size + self.top + 1,
+                                                                   self.cell_size - 2, self.cell_size - 2))
+                    font = pygame.font.Font(None, self.cell_size)
+                    text = font.render(f'{self.board[y][x]}', True, 'red')
+                    screen.blit(text, (x * self.cell_size + self.left + self.cell_size // 3,
+                                       y * self.cell_size + self.top + self.cell_size // 5))
         
 
 if __name__ == '__main__':
@@ -155,9 +193,6 @@ if __name__ == '__main__':
                 board.get_click(event.pos)
 
         screen.fill((0, 0, 0))
-        """font = pygame.font.Font(None, 50)
-        text = font.render("-", True, (100, 255, 100))
-        screen.blit(text, (10, 10))"""
         board.render(screen)
         pygame.display.flip()
         clock.tick(fps)
