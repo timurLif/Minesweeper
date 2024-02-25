@@ -22,6 +22,11 @@ class Board:
         self.field_width = field_width
         self.field_height = field_height
         self.board = [['-'] * self.field_width for _ in range(self.field_height)]
+        self.start_time = pygame.time.get_ticks()
+        self.restart_button = False
+        self.lobby_button = False
+        self.changes_on_the_board = True
+        self.count_open_cells = 0
 
         list_mines = []
         if field_width == field_height == 8:
@@ -31,7 +36,8 @@ class Board:
                 
                 if current_mine_coord not in list_mines:
                     list_mines.append(current_mine_coord)
-            
+
+            self.max_cells = 8 * 8
             self.set_view(30, 30, 50)
         
         elif field_width == field_height == 16:
@@ -42,8 +48,11 @@ class Board:
                 if current_mine_coord not in list_mines:
                     list_mines.append(current_mine_coord)
 
+            self.max_cells = 16 * 16
             self.set_view(30, 30, 25)
         
+        self.num_of_mines = len(list_mines)
+
         for i in list_mines:
             self.board[i[0]][i[1]] = '*'
 
@@ -83,8 +92,20 @@ class Board:
     
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        if cell != None:
+        if cell != None and self.changes_on_the_board == True:
             self.open_cell(cell[0], cell[1])
+        
+        elif 445 < mouse_pos[0] < 582 and 200 < mouse_pos[1] < 290:
+            self.restart_button = True
+        
+        elif 445 < mouse_pos[0] < 582 and 340 < mouse_pos[1] < 430:
+            self.lobby_button = True
+    
+    def restart(self):
+        return self.restart_button
+    
+    def lobby(self):
+        return self.lobby_button
     
     def open_cell(self, x, y):
         if self.board[y][x] == '-':
@@ -140,6 +161,22 @@ class Board:
         
         elif len(self.board[y][x]) == 2:
             self.board[y][x] = self.board[y][x][1]
+        
+        elif self.board[y][x] == '*':
+            self.changes_on_the_board = False
+        
+        for y in range(self.field_height):
+            for x in range(self.field_width):
+                if self.board[y][x] == '0':
+                    self.count_open_cells += 1
+
+                elif len(self.board[y][x]) == 1 and self.board[y][x].isdigit():
+                    self.count_open_cells += 1
+
+        if (self.max_cells - self.count_open_cells) == self.num_of_mines:
+            self.changes_on_the_board = 'win'
+        
+        self.count_open_cells = 0
 
     # Вычисление координат клетки
     def get_cell(self, mouse_pos):
@@ -149,7 +186,19 @@ class Board:
             return (cell_x, cell_y)
         
         return None
-    
+
+    def time(self):
+        font_time = pygame.font.Font(None, 50)
+        minutes = time_elapsed // 60000
+        seconds = (time_elapsed % 60000) // 1000
+        text_time = font_time.render(f'{minutes:02d}:{seconds:02d}', True, 'white')
+        screen.blit(text_time, (475, 125))
+        board_sprites.draw(screen)
+
+        # restart и выход в меню
+        pygame.draw.rect(screen, 'white', (445, 200, 137, 90), 2)
+        pygame.draw.rect(screen, 'white', (445, 340, 137, 90), 2)
+
     def render(self, screen):
         for y in range(self.field_height):
             for x in range(self.field_width):
@@ -170,7 +219,24 @@ class Board:
                     text = font.render(f'{self.board[y][x]}', True, 'red')
                     screen.blit(text, (x * self.cell_size + self.left + self.cell_size // 3,
                                        y * self.cell_size + self.top + self.cell_size // 5))
-        
+                    self.time()
+                
+                if self.changes_on_the_board == False and self.board[y][x] == '*':
+                    screen.fill(pygame.Color('red'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                   y * self.cell_size + self.top + 1,
+                                                                   self.cell_size - 2, self.cell_size - 2))
+                    self.time()
+                
+                if self.changes_on_the_board == 'win' and self.board[y][x] == '*':
+                    screen.fill(pygame.Color('green'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                   y * self.cell_size + self.top + 1,
+                                                                   self.cell_size - 2, self.cell_size - 2))
+
+# Пробный класс главного меню, который надо переделать и сделать красивым
+class MainMenu:
+    def __init__(self):
+        self.game_mode = (0, 0)
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -178,10 +244,36 @@ if __name__ == '__main__':
     size = width, height = 600, 470
     screen = pygame.display.set_mode(size)
 
+    # Спрайты в классе Board
+    board_sprites = pygame.sprite.Group()
+
+    clock_sprite = pygame.sprite.Sprite(board_sprites)
+    clock_sprite.image = load_image("clock.jpeg")
+    clock_sprite.rect = clock_sprite.image.get_rect()
+    clock_sprite.image = pygame.transform.scale(clock_sprite.image, (100, 100))
+    clock_sprite.rect.x = 466
+    clock_sprite.rect.y = 10
+
+    restart_sprite = pygame.sprite.Sprite(board_sprites)
+    restart_sprite.image = load_image("restart.jpeg")
+    restart_sprite.rect = restart_sprite.image.get_rect()
+    restart_sprite.image = pygame.transform.scale(restart_sprite.image, (150, 150))
+    restart_sprite.rect.x = 438
+    restart_sprite.rect.y = 170
+
+    lobby_sprite = pygame.sprite.Sprite(board_sprites)
+    lobby_sprite.image = load_image("home.jpeg")
+    lobby_sprite.rect = lobby_sprite.image.get_rect()
+    lobby_sprite.image = pygame.transform.scale(lobby_sprite.image, (100, 100))
+    lobby_sprite.rect.x = 463
+    lobby_sprite.rect.y = 333
+    
     fps = 60
     clock = pygame.time.Clock()
-    board = Board(8, 8)
-    #board.set_view(100, 50, 40)
+    # board = Board(8, 8)
+    main_menu = MainMenu()
+    game_run = False
+    # board.set_view(100, 50, 40)
 
     running = True
     while running:
@@ -190,9 +282,28 @@ if __name__ == '__main__':
                 running = False
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
+                if game_run:
+                    board.get_click(event.pos)
+                else:
+                    main_menu.get_click(event.pos)
 
         screen.fill((0, 0, 0))
-        board.render(screen)
+
+        if main_menu.open_game()[0]:
+            main_menu.render(screen)
+            count = 'New board'
+        elif main_menu.open_game()[0] == False and count == 'New board':
+            board = Board(main_menu.open_game()[1][0], main_menu.open_game()[1][1])
+            game_run = True
+            count = None
+        elif board.restart():
+            board = Board(main_menu.open_game()[1][0], main_menu.open_game()[1][1])
+        elif board.lobby():
+            game_run = False
+            main_menu.game_mode = (0, 0)
+        else:
+            board.render(screen)
+            time_elapsed = pygame.time.get_ticks() - board.start_time
+
         pygame.display.flip()
         clock.tick(fps)
