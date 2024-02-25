@@ -250,6 +250,19 @@ class MainMenu:
         else:
             return (False, self.game_mode)
 
+    def render(self, screen):
+        font = pygame.font.Font(None, 35)
+        text = font.render(f'Выбери режим: 8 * 8 или 16 * 16', True, 'white')
+        screen.blit(text, (50, 50))
+
+        text_1 = font.render(f'8 * 8', True, 'white')
+        screen.blit(text_1, (76, 135))
+        pygame.draw.rect(screen, 'white', (50, 100, 100, 100), 1)
+
+        text_2 = font.render(f'16 * 16', True, 'white')
+        screen.blit(text_2, (263, 135))
+        pygame.draw.rect(screen, 'white', (250, 100, 100, 100), 1)
+
 
 if __name__ == '__main__':
     pygame.init()
