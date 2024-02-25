@@ -237,6 +237,13 @@ class MainMenu:
     def __init__(self):
         self.game_mode = (0, 0)
 
+    def get_click(self, mouse_pos):
+        if 50 < mouse_pos[0] < 150 and 100 < mouse_pos[1] < 200:
+            self.game_mode = (8, 8)
+
+        elif 250 < mouse_pos[0] < 350 and 100 < mouse_pos[1] < 200:
+            self.game_mode = (16, 16)
+
 
 if __name__ == '__main__':
     pygame.init()
