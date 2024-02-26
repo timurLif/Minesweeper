@@ -262,22 +262,24 @@ class MainMenu:
     def render(self, screen):
         font = pygame.font.Font(None, 35)
         if self.current_screen == 'select_screen':
-            pygame.draw.rect(screen, 'black', (50, 45, 400, 35))
-            text = font.render(f'Выбери режим: 8 * 8 или 16 * 16', True, 'white')
+            text = font.render(f'Выбери режим: 8 * 8 или 16 * 16', True, 'black')
             screen.blit(text, (50, 50))
 
-            pygame.draw.rect(screen, 'black', (50, 100, 100, 100))
-            text_1 = font.render(f'8 * 8', True, 'white')
+            pygame.draw.rect(screen, (150, 150, 150), (50, 100, 100, 100))
+            pygame.draw.rect(screen, (200, 200, 200), (55, 105, 90, 90))
+            text_1 = font.render(f'8 * 8', True, 'black')
             screen.blit(text_1, (76, 135))
 
-            pygame.draw.rect(screen, 'black', (250, 100, 100, 100))
-            text_2 = font.render(f'16 * 16', True, 'white')
+            pygame.draw.rect(screen, (150, 150, 150), (250, 100, 100, 100))
+            pygame.draw.rect(screen, (200, 200, 200), (255, 105, 90, 90))
+            text_2 = font.render(f'16 * 16', True, 'black')
             screen.blit(text_2, (263, 135))
 
 
         elif self.current_screen == 'start':
-            pygame.draw.rect(screen, 'black', (100, 100, 100, 50))
-            text_0 = font.render(f'Играть', True, 'white')
+            pygame.draw.rect(screen, (150, 150, 150), (100, 100, 100, 50))
+            pygame.draw.rect(screen, (200, 200, 200), (105, 105, 90, 40))
+            text_0 = font.render(f'Играть', True, 'black')
             screen.blit(text_0, (112, 115))
 
 
@@ -334,7 +336,9 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         if not game_run:
             bg = load_image("minesweeper.jpeg")
-            screen.blit(bg, (-20, -15))
+            screen.blit(bg, (-45, -14))
+            pygame.draw.rect(screen, (150, 150, 150), (0, 0, 450, 470))
+            pygame.draw.rect(screen, (200, 200, 200), (5, 5, 440, 460))
         if main_menu.open_game()[0]:
             main_menu.render(screen)
         elif main_menu.open_game()[0] is False and main_menu.count == 'New board':
