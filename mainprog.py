@@ -6,7 +6,7 @@ import random
 
 # Функция загрузки фото
 def load_image(name, colorkey=None):
-    fullname = os.path.join('pictures', name)
+    fullname = os.path.join('Minesweeper/pictures', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -27,6 +27,8 @@ class Board:
         self.changes_on_the_board = True
         self.count_open_cells = 0
         self.result = 'run'
+        self.minutes = 0
+        self.seconds = 0
 
         list_mines = []
         if field_width == field_height == 8:
