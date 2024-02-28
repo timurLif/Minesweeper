@@ -287,7 +287,6 @@ class MainMenu:
             text_0 = font_start.render(f'START', True, 'white')
             screen.blit(text_0, (105, 127))
 
-
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Minesweeper')
