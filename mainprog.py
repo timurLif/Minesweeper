@@ -4,9 +4,10 @@ import sys
 import pygame
 import random
 
+
 # Функция загрузки фото
-def load_image(name, colorkey=None):
-    fullname = os.path.join('Minesweeper/pictures', name)
+def load_image(name):
+    fullname = os.path.join('pictures', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -18,6 +19,9 @@ def load_image(name, colorkey=None):
 class Board:
     # создание поля
     def __init__(self, field_width, field_height):
+        self.cell_size = None
+        self.top = None
+        self.left = None
         self.field_width = field_width
         self.field_height = field_height
         self.board = [['-'] * self.field_width for _ in range(self.field_height)]
@@ -96,7 +100,7 @@ class Board:
     # Проверка нажатия в определенных зонах
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        if cell != None and self.changes_on_the_board == True:
+        if cell is not None and self.changes_on_the_board is True:
             self.open_cell(cell[0], cell[1])
 
         elif 445 < mouse_pos[0] < 582 and 200 < mouse_pos[1] < 290:
@@ -188,7 +192,7 @@ class Board:
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
         cell_y = (mouse_pos[1] - self.top) // self.cell_size
         if 0 <= cell_x <= self.field_width - 1 and 0 <= cell_y <= self.field_height - 1:
-            return (cell_x, cell_y)
+            return tuple([cell_x, cell_y])
 
         return None
 
@@ -205,12 +209,12 @@ class Board:
         pygame.draw.rect(screen, 'white', (445, 200, 137, 90), 2)
         pygame.draw.rect(screen, 'white', (445, 340, 137, 90), 2)
 
-    def render(self, screen):
+    def render(self, scrn):
         for y in range(self.field_height):
             for x in range(self.field_width):
-                pygame.draw.rect(screen, 'white', (x * self.cell_size + self.left,
-                                                   y * self.cell_size + self.top,
-                                                   self.cell_size, self.cell_size), 1)
+                pygame.draw.rect(scrn, 'white', (x * self.cell_size + self.left,
+                                                 y * self.cell_size + self.top,
+                                                 self.cell_size, self.cell_size), 1)
 
                 if self.board[y][x] == '0':
                     screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
@@ -218,28 +222,28 @@ class Board:
                                                                   self.cell_size - 2, self.cell_size - 2))
 
                 elif len(self.board[y][x]) == 1 and self.board[y][x].isdigit():
-                    screen.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
-                                                                  y * self.cell_size + self.top + 1,
-                                                                  self.cell_size - 2, self.cell_size - 2))
+                    scrn.fill(pygame.Color('gray'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                y * self.cell_size + self.top + 1,
+                                                                self.cell_size - 2, self.cell_size - 2))
                     font = pygame.font.Font(None, self.cell_size)
                     text = font.render(f'{self.board[y][x]}', True, 'red')
-                    screen.blit(text, (x * self.cell_size + self.left + self.cell_size // 3,
-                                       y * self.cell_size + self.top + self.cell_size // 5))
+                    scrn.blit(text, (x * self.cell_size + self.left + self.cell_size // 3,
+                                     y * self.cell_size + self.top + self.cell_size // 5))
                     self.time()
 
-                if self.changes_on_the_board == False and self.board[y][x] == '*':
+                if self.changes_on_the_board is False and self.board[y][x] == '*':
                     self.result = 'loss'
-                    screen.fill(pygame.Color('red'), pygame.Rect(x * self.cell_size + self.left + 1,
-                                                                 y * self.cell_size + self.top + 1,
-                                                                 self.cell_size - 2, self.cell_size - 2))
+                    scrn.fill(pygame.Color('red'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                               y * self.cell_size + self.top + 1,
+                                                               self.cell_size - 2, self.cell_size - 2))
                     self.time()
 
                 if self.changes_on_the_board == 'win' and self.board[y][x] == '*':
                     self.result = 'win'
-                    screen.fill(pygame.Color('green'), pygame.Rect(x * self.cell_size + self.left + 1,
-                                                                   y * self.cell_size + self.top + 1,
-                                                                   self.cell_size - 2, self.cell_size - 2))
-                
+                    scrn.fill(pygame.Color('green'), pygame.Rect(x * self.cell_size + self.left + 1,
+                                                                 y * self.cell_size + self.top + 1,
+                                                                 self.cell_size - 2, self.cell_size - 2))
+
 
 # Реализация главного меню
 class MainMenu:
@@ -261,33 +265,32 @@ class MainMenu:
                 self.game_mode = (16, 16)
             self.count = 'New board'
 
-
     def open_game(self):
         if self.game_mode == (0, 0):
-            return (True, self.game_mode)
+            return tuple([True, self.game_mode])
         else:
-            return (False, self.game_mode)
+            return tuple([False, self.game_mode])
 
-    def render(self, screen):
+    def render(self, scrn):
         font_start = pygame.font.Font(None, 45)
         font_choice = pygame.font.Font(None, 65)
         if self.current_screen == 'select_screen':
-            pygame.draw.rect(screen, 'black', (50, 100, 200, 200))
-            pygame.draw.rect(screen, 'white', (50, 100, 200, 200), 2)
+            pygame.draw.rect(scrn, 'black', (50, 100, 200, 200))
+            pygame.draw.rect(scrn, 'white', (50, 100, 200, 200), 2)
             text_1 = font_choice.render(f'8 * 8', True, 'white')
-            screen.blit(text_1, (105, 170))
+            scrn.blit(text_1, (105, 170))
 
-            pygame.draw.rect(screen, 'black', (350, 100, 200, 200))
-            pygame.draw.rect(screen, 'white', (350, 100, 200, 200), 2)
+            pygame.draw.rect(scrn, 'black', (350, 100, 200, 200))
+            pygame.draw.rect(scrn, 'white', (350, 100, 200, 200), 2)
             text_2 = font_choice.render(f'16 * 16', True, 'white')
-            screen.blit(text_2, (380, 170))
-
+            scrn.blit(text_2, (380, 170))
 
         elif self.current_screen == 'start':
-            pygame.draw.rect(screen, 'black', (50, 100, 200, 75))
-            pygame.draw.rect(screen, 'white', (50, 100, 200, 75), 2)
+            pygame.draw.rect(scrn, 'black', (50, 100, 200, 75))
+            pygame.draw.rect(scrn, 'white', (50, 100, 200, 75), 2)
             text_0 = font_start.render(f'START', True, 'white')
-            screen.blit(text_0, (105, 127))
+            scrn.blit(text_0, (105, 127))
+
 
 if __name__ == '__main__':
     pygame.init()
